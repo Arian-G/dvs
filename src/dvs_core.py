@@ -6,17 +6,19 @@ import json as js
 class router:
     def __init__( self, router_id ):
         self.router_id = router_id
-        self.dv_table = { }
+        self.dv_table = { self.router_id : 0 }
         self.neighbors = set( )
 
     def update_dv_table( self, router, cost ):
-        self.dv_table[ router ] = cost
+        self.dv_table[ router.router_id ] = cost
 
     def update_neighbors( self, router ):
-        self.neighbors.add( router )
+        self.neighbors.add( router.router_id )
 
     def propogate_dv( self, conn ):
         # TODO: add Bellman-Ford algorithm
+        # Could iterate through keys in dv_table
+        # instead of keeping a sep. data structure
         for neighbor in self.neighbors:
             message = js.dumps({ self.router_id, self.dv_table })
             conn.sendall( message.encode( ))
@@ -70,9 +72,9 @@ class dvs_core:
                         self.routers[ b_id ] = b
 
                     a.update_dv_table( b, cost )
-                    a.update_neighbors( b )
+                    # a.update_neighbors( b )
                     b.update_dv_table( a, cost )
-                    b.update_neighbors( a )
+                    # b.update_neighbors( a )
         except FileNotFoundError:
             s = "core_load: File not found."
             return False, s
