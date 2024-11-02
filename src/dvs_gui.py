@@ -1,4 +1,6 @@
 import dearpygui.dearpygui as dpg
+import os
+from dvs_core import dvs_core, router
 
 class dvs_gui:
     def __init__( self ):
@@ -22,9 +24,9 @@ class dvs_gui:
         ##### Menu Bar
         menu_bar = dpg.add_menu_bar( parent = self.root )
         file_menu = dpg.add_menu( label = "File", parent = menu_bar )
-        dpg.add_menu_item( label = "Load", parent = file_menu, callback = self.load )
-        dpg.add_menu_item( label = "Save", parent = file_menu, callback = self.save )
-        dpg.add_menu_item( label = "Save As", parent = file_menu, callback = self.save_as )
+        dpg.add_menu_item( label = "Load", parent = file_menu, callback = lambda : self.select_file( "load" ) )
+        dpg.add_menu_item( label = "Save", parent = file_menu, callback = lambda : self.select_file( "save" ))
+        dpg.add_menu_item( label = "Save As", parent = file_menu, callback = lambda : self.select_file( "save_as" ))
 
         ##### Settings Menu
         settings_menu = dpg.add_menu( label = "Settings", parent = menu_bar )
@@ -55,13 +57,26 @@ class dvs_gui:
             parent = about_menu
         )
 
-    def load( self ):
-        pass
+    def select_file( self, option ):
+        f_dialog = dpg.add_file_dialog( show = True, default_path = os.getcwd( ), height = 300 )
+        dpg.add_file_extension( ".txt", parent = f_dialog )
+        if option == "load":
+            dpg.set_item_callback( f_dialog, self.load )
+        elif option == "save":
+            dpg.set_item_callback( f_dialog, self.save )
+        else:
+            dpg.set_item_callback( f_dialog, self.save_as )
 
-    def save( self ):
+    def load( self, _, app_data ):
+        filename = app_data[ "file_name" ]
+        res, s = dvs_core( ).load( filename )
+        if not res:
+            print( s )
+
+    def save( self, _, app_data ):
         pass
     
-    def save_as( self ):
+    def save_as( self, _, app_data ):
         pass
 
     def create_node_editor( self ):
