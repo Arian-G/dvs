@@ -62,7 +62,7 @@ class dvs_core:
         try:
             with open( filename, "r" ) as file:
                 for line in file:
-                    a_id, b_id, cost = map( int, line.split( ))
+                    a_id, b_id, cost = map( int, line.strip( ).split( ))
 
                     if a_id not in self.routers:
                         a = router( a_id )
@@ -71,16 +71,17 @@ class dvs_core:
                         b = router( b_id )
                         self.routers[ b_id ] = b
 
+                    a = self.routers[ a_id ]
+                    b = self.routers[ b_id ]
                     a.update_dv_table( b, cost )
-                    # a.update_neighbors( b )
                     b.update_dv_table( a, cost )
-                    # b.update_neighbors( a )
         except FileNotFoundError:
             s = "core_load: File not found."
             return False, s
         except Exception:
             s = "core_load: Unexpected error encountered."
             return False, s
+        return True, None
     
     def save( self ):
         pass
